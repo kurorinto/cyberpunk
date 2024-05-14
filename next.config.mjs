@@ -4,10 +4,10 @@ const nextConfig = {
     // sitecdn.zcycdn.com
     remotePatterns: [
       {
-        hostname: 'sitecdn.zcycdn.com'
-      }
-    ]
-  }
-};
+        hostname: "sitecdn.zcycdn.com",
+      },
+    ],
+  },
+}
 
-export default nextConfig;
+export default nextConfig
