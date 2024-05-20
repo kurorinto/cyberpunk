@@ -5,7 +5,7 @@ interface HeaderProps {}
 
 const Header: FC<HeaderProps> = () => {
   return (
-    <header className="sticky top-0 h-[64px] flex justify-center shadow backdrop-blur-[8px]">
+    <header className="sticky top-0 h-[64px] flex justify-center shadow backdrop-blur">
       <div className="w-[1400px] px-[24px] flex items-center justify-between">
         <nav className="flex items-center gap-[24px]">
           <a href="">Home</a>

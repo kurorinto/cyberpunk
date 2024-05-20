@@ -11,8 +11,8 @@ export default function Home() {
     //     </Link>
     //   ))}
     // </div>
-    <div className="h-full w-full">
-
+    <div className="h-full w-[1280px] mx-auto px-[24px] py-[32px]">
+      main
     </div>
   )
 }

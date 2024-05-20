@@ -20,7 +20,7 @@ export default function RootLayout(
     <html lang="en">
       <body className={inter.className}>
         <Header />
-        {props.children}
+        <main>{props.children}</main>
         {props.modal}
       </body>
     </html>
