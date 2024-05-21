@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react";
 
 interface HomeProps {}
 
 const fn = (i: any) => {
-  console.log(i)
-}
+  console.log(i);
+};
 
 const Home: FC<HomeProps> = () => {
-  const [data, setData] = useState()
+  const [data, setData] = useState();
 
   const getData = async () => {
-    const r = await fetch("/api")
-    const res = await r.json()
+    const r = await fetch("/api");
+    const res = await r.json();
 
-    setData(res.data)
-  }
+    setData(res.data);
+  };
 
   useEffect(() => {
     // getData()
-    location.href = "/api"
-    return () => {}
-  }, [])
+    location.href = "/api";
+    return () => {};
+  }, []);
 
-  return <div>{data}</div>
-}
+  return <div>{data}</div>;
+};
 
-export default Home
+export default Home;

@@ -1,16 +1,18 @@
-"use client"
+"use client";
 
-import photos from "@/constants/photos"
-import Image from "next/image"
-import Link from "next/link"
-import request from "@/request"
-import { useEffect } from "react"
+import photos from "@/constants/photos";
+import Image from "next/image";
+import Link from "next/link";
+import request from "@/request";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [username, setUsername] = useState("");
+
   const getUsers = async () => {
-    const res = await request.get("/api/user")
-    console.log(res)
-  }
+    const res = await request.get("/api/user");
+    console.log(res);
+  };
 
   const addUser = async () => {
     const res = await request.post("/api/user", {
@@ -18,12 +20,12 @@ export default function Home() {
       avatar: "https://sitecdn.zcycdn.com/1133XY/b47a33dc-be82-4217-b8bb-3448e22dd5bf",
       username: "superadmin",
       password: "test123456",
-    })
-  }
+    });
+  };
 
   useEffect(() => {
-    getUsers()
-  }, [])
+    getUsers();
+  }, []);
 
   return (
     // <div className="cards-container">
@@ -35,6 +37,7 @@ export default function Home() {
     // </div>
     <div className="h-full w-[1280px] mx-auto px-[24px] py-[32px]">
       <button onClick={addUser}>add user</button>
+      <input type="text" value={username} />
     </div>
-  )
+  );
 }

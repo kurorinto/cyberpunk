@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import "dotenv/config";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -16,6 +16,6 @@ const nextConfig = {
     DB_PASSWORD: process.env.DB_PASSWORD,
     DB_DATABASE: process.env.DB_DATABASE,
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
