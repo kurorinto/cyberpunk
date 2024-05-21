@@ -2,13 +2,13 @@ import axios from "axios"
 
 const baseURL = "http://localhost:3000"
 
-const axiosInstance = axios.create({
+const request = axios.create({
   baseURL,
   timeout: 10 * 1000,
 })
 
 // 添加请求拦截器
-axios.interceptors.request.use(
+request.interceptors.request.use(
   function (config) {
     // 在发送请求之前做些什么
     return config
@@ -20,7 +20,7 @@ axios.interceptors.request.use(
 )
 
 // 添加响应拦截器
-axiosInstance.interceptors.response.use(
+request.interceptors.response.use(
   function (response) {
     // 2xx 范围内的状态码都会触发该函数。
     // 对响应数据做点什么
@@ -33,4 +33,4 @@ axiosInstance.interceptors.response.use(
   },
 )
 
-export default axiosInstance
+export default request
