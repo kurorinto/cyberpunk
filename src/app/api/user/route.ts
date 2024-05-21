@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   })
 
   try {
-    const [result] = await connection.execute('INSERT INTO user (name, avatar, username, password) VALUES (?, ?, ?, ?)', [name, avatar, username, password])
+    const [result] = await connection.execute(`INSERT INTO user (name, avatar, username, password) VALUES ('${name}', '${avatar}', '${username}', '${password}')`)
     return Response.json({ result })
   } catch (e) {
     return Response.json({ success: false, result: null, message: null, code: 500 })
@@ -31,6 +31,5 @@ export async function GET(request: Request) {
     const [rows] = await connection.query('SELECT * FROM user')
     return Response.json({ success: true, result: rows, message: null, code: null })
   } catch (e) {
-    // res.status(500).json({ message: e.message })
   };
 }
