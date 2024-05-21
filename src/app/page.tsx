@@ -37,7 +37,7 @@ export default function Home() {
     // </div>
     <div className="h-full w-[1280px] mx-auto px-[24px] py-[32px]">
       <button onClick={addUser}>add user</button>
-      <input type="text" value={username} />
+      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
     </div>
   );
 }
