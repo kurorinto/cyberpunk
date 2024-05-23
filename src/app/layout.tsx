@@ -1,7 +1,7 @@
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./global.css";
-import Header from "@/components/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +19,22 @@ export default function RootLayout(
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
         <main>{props.children}</main>
         {props.modal}
+        <Toaster
+          closeButton
+          richColors
+          toastOptions={{
+            classNames: {
+              toast: "items-start leading-[20px]",
+              icon: "mt-[3px]",
+              title: "leading-[22px] text-[16px] break-all",
+              description: "leading-[20px] max-h-[150px] overflow-y-auto break-all",
+            },
+          }}
+          visibleToasts={Infinity}
+          position="top-right"
+        />
       </body>
     </html>
   );

@@ -7,5 +7,8 @@ export const POST = withErrorHandler(async (request) => {
 
   const [result] = await pool.query(`SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`);
 
-  return result;
+  if (result instanceof Array && result.length) {
+    const user = result[0];
+    return user;
+  }
 });

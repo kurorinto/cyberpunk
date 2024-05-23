@@ -1,30 +1,44 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import request from "@/request";
+import { useEffect, useState } from "react";
 
-interface HomeProps {}
+export default function Home() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-const fn = (i: any) => {
-  console.log(i);
-};
-
-const Home: FC<HomeProps> = () => {
-  const [data, setData] = useState();
-
-  const getData = async () => {
-    const r = await fetch("/api");
-    const res = await r.json();
-
-    setData(res.data);
+  const getUsers = async () => {
+    const res = await request.get("/api/user");
+    console.log(res);
   };
 
   useEffect(() => {
-    // getData()
-    location.href = "/api";
-    return () => {};
+    getUsers();
   }, []);
 
-  return <div>{data}</div>;
-};
-
-export default Home;
+  return (
+    // <div className="cards-container">
+    //   {photos.map((item, index) => (
+    //     <Link key={index} className="card" href={`/photos/${item.id}`} passHref>
+    //       <Image src={item.src} alt="" width={300} height={100} priority className="w-auto h-auto" />
+    //     </Link>
+    //   ))}
+    // </div>
+    <div className="h-full w-[1280px] mx-auto px-[24px] py-[32px] flex flex-col gap-y-[12px]">
+      <Button
+        onClick={async () => {
+          const res = await request.post("/api/login", {
+            username,
+            password,
+          });
+        }}
+      >
+        click
+      </Button>
+      <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+      <Input value={password} onChange={(e) => setPassword(e.target.value)} />
+    </div>
+  );
+}
