@@ -22,7 +22,7 @@ export default function RootLayout(
         <main>{props.children}</main>
         {props.modal}
         <Toaster
-          closeButton
+          // closeButton
           richColors
           toastOptions={{
             classNames: {

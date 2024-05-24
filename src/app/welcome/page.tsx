@@ -7,6 +7,7 @@ import request from "@/request";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 interface WelcomeProps {}
@@ -17,11 +18,10 @@ const FormSchema = z.object({
 });
 
 const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-  const res = await request.post('/api/login', data);
-  console.log(res);
-  // if (success) {
-  //   console.log('登录成功');
-  // }
+  const { success } = await request.post('/api/login', data);
+  if (success) {
+    toast.success('登录成功');
+  }
 };
 
 const Welcome: FC<WelcomeProps> = () => {

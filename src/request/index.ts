@@ -36,9 +36,10 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   function (response) {
     const data: ApiData = response.data;
-    if (!data.success) {
+    const { success, code, result, message } = data;
+    if (!success) {
       // todo: code区分
-      toast.error('服务器开小差了～', {
+      toast.error(message || '服务器开小差了～', {
         description: `url: ${response.config.url}`,
       });
     }
