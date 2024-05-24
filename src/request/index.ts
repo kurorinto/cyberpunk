@@ -1,13 +1,26 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { toast } from "sonner";
+import store from 'store';
 
 const baseURL = "http://localhost:3000";
+
+export const ACCESS_TOKEN_KEY = 'cyberpunk_access';
+export const REFRESH_TOKEN_KEY = 'cyberpunk-refresh';
+
+/** 
+ * 401: 未登录
+ * 402: 登录失效
+ * 403: 无权限
+ * 500: 服务器错误
+ * null: 无错误
+ */
+export type CODE = 500 | 401 | 402 | 403
 
 interface ApiData<T = any> {
   success: boolean
   message: string | null
   result: T | null
-  code: number | null
+  code: CODE
 }
 
 interface MyRequest {
@@ -19,6 +32,9 @@ const axiosInstance = axios.create({
   baseURL,
   timeout: 10 * 1000,
 });
+
+// 过期的请求
+let expiredRequestStack: Array<() => Promise<AxiosResponse>> = [];
 
 // 添加请求拦截器
 axiosInstance.interceptors.request.use(
@@ -34,14 +50,48 @@ axiosInstance.interceptors.request.use(
 
 // 添加响应拦截器
 axiosInstance.interceptors.response.use(
-  function (response) {
+  async function (response) {
     const data: ApiData = response.data;
+    const { headers } = response;
     const { success, code, result, message } = data;
-    if (!success) {
-      // todo: code区分
-      toast.error(message || '服务器开小差了～', {
-        description: `url: ${response.config.url}`,
-      });
+    // 成功拦截
+    if (success) {
+      // 设置refreshToken
+      const rt = headers[REFRESH_TOKEN_KEY];
+      if (rt) {
+        store.set(REFRESH_TOKEN_KEY, rt);
+        // 执行之前过期的请求
+        expiredRequestStack.forEach(request => request());
+        expiredRequestStack = [];
+      }
+    } else {
+      // 失败处理
+      switch (code) {
+        case 401:
+          // 清除rt
+          store.remove(REFRESH_TOKEN_KEY);
+          toast.error(message || '请先登录', {
+            description: `url: ${response.config.url}`,
+          });
+          break;
+        case 402:
+          // 登录失效 重新获取
+          const rt = store.get(REFRESH_TOKEN_KEY);
+          // 将此次请求缓存在过期请求中
+          expiredRequestStack.push(() => axiosInstance(response.config));
+          await request.post('/api/account/refresh', { rt });
+          break;
+        case 500:
+          toast.error(message || '服务器开小差了', {
+            description: `url: ${response.config.url}`,
+          });
+          break;
+        default:
+          toast.error(message || '未知错误', {
+            description: `url: ${response.config.url}`,
+          });
+          break;
+      }
     }
     // 对响应数据做点什么
     return response;

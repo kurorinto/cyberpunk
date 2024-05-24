@@ -1,7 +1,7 @@
 import withErrorHandler from "@/apiHandlers/withErrorHandler";
 import pool from "@/db";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/request";
 import jwt from "jsonwebtoken";
-
 
 export const POST = withErrorHandler(async (request) => {
   const body = await request.json();
@@ -17,8 +17,8 @@ export const POST = withErrorHandler(async (request) => {
   }
 
   // 账号正确 生成双token
-  const accessToken = jwt.sign({ username, password }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '1m' });
-  const refreshToken = jwt.sign({ username, password }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '30d' });
+  const at = jwt.sign({ username, password }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '1m' });
+  const rt = jwt.sign({ username, password }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '30d' });
 
-  return [result[0], { headers: { 'set-cookie': `cyberpunk_access=${accessToken}`, 'cyberpunk-refresh': refreshToken } }];
+  return [null, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=${at};PATH=/`, [REFRESH_TOKEN_KEY]: rt } }];
 });

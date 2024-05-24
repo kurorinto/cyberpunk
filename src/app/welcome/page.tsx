@@ -18,7 +18,7 @@ const FormSchema = z.object({
 });
 
 const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-  const { success } = await request.post('/api/login', data);
+  const { success } = await request.post('/api/account/login', data);
   if (success) {
     toast.success('登录成功');
   }
