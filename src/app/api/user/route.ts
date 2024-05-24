@@ -9,10 +9,10 @@ export const POST = withErrorHandler(async (request) => {
     `INSERT INTO user (name, avatar, username, password) VALUES ('${name}', '${avatar}', '${username}', '${password}')`,
   );
 
-  return true;
+  return [true];
 });
 
 export const GET = withErrorHandler(async () => {
   const [result] = await pool.query("SELECT * FROM user");
-  return result;
+  return [result];
 });
