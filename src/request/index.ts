@@ -33,9 +33,6 @@ const axiosInstance = axios.create({
   timeout: 10 * 1000,
 });
 
-// 过期的请求
-let expiredRequestStack: Array<() => Promise<AxiosResponse>> = [];
-
 // 添加请求拦截器
 axiosInstance.interceptors.request.use(
   function (config) {
@@ -60,9 +57,6 @@ axiosInstance.interceptors.response.use(
       const rt = headers[REFRESH_TOKEN_KEY];
       if (rt) {
         store.set(REFRESH_TOKEN_KEY, rt);
-        // 执行之前过期的请求
-        expiredRequestStack.forEach(request => request());
-        expiredRequestStack = [];
       }
     } else {
       // 失败处理
@@ -77,9 +71,9 @@ axiosInstance.interceptors.response.use(
         case 402:
           // 登录失效 重新获取
           const rt = store.get(REFRESH_TOKEN_KEY);
-          // 将此次请求缓存在过期请求中
-          expiredRequestStack.push(() => axiosInstance(response.config));
           await request.post('/api/account/refresh', { rt });
+          // 重新请求
+          await axiosInstance(response.config);
           break;
         case 500:
           toast.error(message || '服务器开小差了', {
