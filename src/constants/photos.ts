@@ -7,6 +7,6 @@ const photos = [
     id: "2",
     src: "https://sitecdn.zcycdn.com/1133XY/a83ee1ba-1af4-487a-b3a1-71680d55cf6d.png",
   },
-];
+]
 
-export default photos;
+export default photos

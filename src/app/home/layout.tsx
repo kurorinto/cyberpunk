@@ -1,5 +1,5 @@
-import Header from "@/components/Header";
-import { FC, Fragment, PropsWithChildren } from "react";
+import Header from "@/components/Header"
+import { FC, Fragment, PropsWithChildren } from "react"
 
 interface HomeLayoutProps {}
 
@@ -9,7 +9,7 @@ const HomeLayout: FC<PropsWithChildren<HomeLayoutProps>> = ({ children }) => {
       <Header />
       {children}
     </Fragment>
-  );
-};
+  )
+}
 
-export default HomeLayout;
+export default HomeLayout

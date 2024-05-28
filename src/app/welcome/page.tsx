@@ -1,28 +1,28 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import request from "@/request";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FC } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import request from "@/request"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { FC } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { z } from "zod"
 
 interface WelcomeProps {}
 
 const FormSchema = z.object({
   username: z.string({ message: '请输入用户名' }),
   password: z.string({ message: '请输入密码' }),
-});
+})
 
 const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-  const { success } = await request.post('/api/account/login', data);
+  const { success } = await request.post('/api/account/login', data)
   if (success) {
-    toast.success('登录成功');
+    toast.success('登录成功')
   }
-};
+}
 
 const Welcome: FC<WelcomeProps> = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -31,7 +31,7 @@ const Welcome: FC<WelcomeProps> = () => {
       username: undefined,
       password: undefined,
     },
-  });
+  })
 
   return (
     <div>
@@ -67,7 +67,7 @@ const Welcome: FC<WelcomeProps> = () => {
         </Form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Welcome;
+export default Welcome

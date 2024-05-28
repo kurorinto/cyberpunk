@@ -1,5 +1,5 @@
-import Image from "next/image";
-import { FC } from "react";
+import Image from "next/image"
+import { FC } from "react"
 
 interface HeaderProps {}
 
@@ -23,7 +23,7 @@ const Header: FC<HeaderProps> = () => {
         </div>
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

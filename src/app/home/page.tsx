@@ -1,22 +1,22 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import request from "@/request";
-import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import request from "@/request"
+import { useEffect, useState } from "react"
 
 export default function Home() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
 
   const getUsers = async () => {
-    const res = await request.get("/api/user");
-    console.log(res);
-  };
+    const res = await request.get("/api/user")
+    console.log(res)
+  }
 
   useEffect(() => {
-    getUsers();
-  }, []);
+    getUsers()
+  }, [])
 
   return (
     // <div className="cards-container">
@@ -32,7 +32,7 @@ export default function Home() {
           const res = await request.post("/api/login", {
             username,
             password,
-          });
+          })
         }}
       >
         click
@@ -40,5 +40,5 @@ export default function Home() {
       <Input value={username} onChange={(e) => setUsername(e.target.value)} />
       <Input value={password} onChange={(e) => setPassword(e.target.value)} />
     </div>
-  );
+  )
 }
