@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
+import { nextFailure } from "./apiHandlers/resultUtils"
 import { ACCESS_TOKEN_KEY } from "./request"
 
 // This function can be marked `async` if using `await` inside
@@ -18,16 +19,13 @@ export const middleware = (request: NextRequest) => {
   const at = cookies?.[ACCESS_TOKEN_KEY]
 
   if (!at) {
-    console.log('没有at')
-    return NextResponse.json({ success: false, result: null, message: '未登录', code: 401 }, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=;PATH=/;MAX-AGE=0` } })
+    return nextFailure({ message: '未登录', code: 401 }, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=;PATH=/;MAX-AGE=0` } })
   }
 
   try {
-    const res = jwt.verify(at, process.env.ACCESS_TOKEN_SECRET!)
-    console.log(res)
+    jwt.verify(at, process.env.ACCESS_TOKEN_SECRET!)
   } catch (error) {
-    console.log('at无效')
-    return NextResponse.json({ success: false, result: null, message: '登录已失效', code: 402 }, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=;PATH=/;MAX-AGE=0` } })
+    return nextFailure({ message: '登录已失效', code: 402 }, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=;PATH=/;MAX-AGE=0` } })
   }
 
   return NextResponse.next()

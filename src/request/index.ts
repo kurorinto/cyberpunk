@@ -16,7 +16,7 @@ export const REFRESH_TOKEN_KEY = 'cyberpunk-refresh'
  */
 export type CODE = 500 | 401 | 402 | 403
 
-interface ApiData<T = any> {
+export interface ApiData<T = any> {
   success: boolean
   message: string | null
   result: T | null
