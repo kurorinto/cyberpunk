@@ -22,6 +22,10 @@ export function failure(dataOrMessage: Omit<ApiData, 'success' | 'result'> | str
   return Response.json(data, init)
 }
 
+export function next() {
+  return NextResponse.next()
+}
+
 export function nextSuccess(result: any, init?: ResponseInit) {
   return NextResponse.json({ success: true, result, message: null, code: null }, init)
 }

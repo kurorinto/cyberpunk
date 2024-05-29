@@ -1,41 +1,27 @@
-import withErrorHandler from "@/apiHandlers/withErrorHandler"
-import pool from "@/db"
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/request"
-import jwt from "jsonwebtoken"
+import { failure, success } from "@/apiHandlers/resultUtils"
+import { ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_KEY, REFRESH_TOKEN_SECRET } from "@/request"
+import * as jose from 'jose'
 
-
-export const POST = withErrorHandler(async (request) => {
+export const POST = async (request: Request) => {
   const body = await request.json()
   const { rt } = body
 
   try {
-    const res = jwt.verify(rt, process.env.REFRESH_TOKEN_SECRET!)
-    console.log(res)
-    // 重新生成 双token
+    // 校验刷新token
+    const res = await jose.jwtVerify(rt, REFRESH_TOKEN_SECRET)
+    // 校验成功 重新生成双token
     if (typeof res !== 'string') {
-      const { username, password } = res
-      const at = jwt.sign({ username, password }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '1m' })
-      const rt = jwt.sign({ username, password }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '30d' })
+      const { username, password } = res.payload
+      const at = await new jose.SignJWT({ username, password }).setExpirationTime('1m').setProtectedHeader({ alg: 'HS256' }).sign(ACCESS_TOKEN_SECRET)
+      const rt = await new jose.SignJWT({ username, password }).setExpirationTime('30d').setProtectedHeader({ alg: 'HS256' }).sign(REFRESH_TOKEN_SECRET)
 
-      return [null, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=${at};PATH=/`, [REFRESH_TOKEN_KEY]: rt } }]
+      return success(null, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=${at};PATH=/`, [REFRESH_TOKEN_KEY]: rt } })
     }
   } catch (error) {
-    console.log('rt无效')
-    throw new Error('未登录', { cause: 401 })
+    console.log('refresh error:', error)
+    // 校验失败 重新登录
+    return failure({ message: '未登录', code: 401 })
   }
 
-  // const [result] = await pool.query(`SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`);
-
-  // if (!(result instanceof Array)) throw new Error('数据错误');
-
-  // // 未查询到
-  // if (!result.length) {
-  //   throw new Error('用户名或密码错误');
-  // }
-
-  // // 账号正确 生成双token
-  // const accessToken = jwt.sign({ username, password }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '1m' });
-  // const refreshToken = jwt.sign({ username, password }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '30d' });
-
-  return [1]
-})
+  return success(null)
+}

@@ -1,11 +1,10 @@
-import jwt from "jsonwebtoken"
+import * as jose from 'jose'
 import type { NextRequest } from "next/server"
-import { NextResponse } from "next/server"
-import { nextFailure } from "./apiHandlers/resultUtils"
-import { ACCESS_TOKEN_KEY } from "./request"
+import { next, nextFailure } from "./apiHandlers/resultUtils"
+import { ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET } from "./request"
 
 // This function can be marked `async` if using `await` inside
-export const middleware = (request: NextRequest) => {
+export const middleware = async (request: NextRequest) => {
   const cookies = request.headers.get('cookie')?.split(';').map(item => item.trim()).reduce((res, item, index) => {
     const splitIndex = item.indexOf('=')
     if (splitIndex !== -1) {
@@ -23,12 +22,15 @@ export const middleware = (request: NextRequest) => {
   }
 
   try {
-    jwt.verify(at, process.env.ACCESS_TOKEN_SECRET!)
+    const res = await jose.jwtVerify(at, ACCESS_TOKEN_SECRET)
+    console.log(res)
   } catch (error) {
+    console.log('error', error)
     return nextFailure({ message: '登录已失效', code: 402 }, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=;PATH=/;MAX-AGE=0` } })
   }
 
-  return NextResponse.next()
+  console.log('success')
+  return next()
 }
 
 // See "Matching Paths" below to learn more

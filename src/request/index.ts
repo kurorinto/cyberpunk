@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
+import axios, { AxiosRequestConfig } from "axios"
 import { toast } from "sonner"
 import store from 'store'
 
@@ -6,6 +6,8 @@ const baseURL = "http://localhost:3000"
 
 export const ACCESS_TOKEN_KEY = 'cyberpunk_access'
 export const REFRESH_TOKEN_KEY = 'cyberpunk-refresh'
+export const ACCESS_TOKEN_SECRET = new TextEncoder().encode('kurorinto_access')
+export const REFRESH_TOKEN_SECRET = new TextEncoder().encode('kurorinto_refesh')
 
 /** 
  * 401: 未登录
@@ -71,9 +73,11 @@ axiosInstance.interceptors.response.use(
         case 402:
           // 登录失效 重新获取
           const rt = store.get(REFRESH_TOKEN_KEY)
-          await request.post('/api/account/refresh', { rt })
-          // 重新请求
-          await axiosInstance(response.config)
+          const { success: refreshSuccess } = await request.post('/api/account/refresh', { rt })
+          if (refreshSuccess) {
+            // 重新请求
+            await axiosInstance(response.config)
+          }
           break
         case 500:
           toast.error(message || '服务器开小差了', {
