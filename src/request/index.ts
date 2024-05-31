@@ -69,6 +69,7 @@ axiosInstance.interceptors.response.use(
           toast.error(message || '请先登录', {
             description: `url: ${response.config.url}`,
           })
+          window.location.href = `/sign/in`
           break
         case 402:
           // 登录失效 重新获取
