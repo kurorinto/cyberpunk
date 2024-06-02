@@ -7,7 +7,7 @@ import request from "@/request"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { FC, useState } from "react"
+import { FC } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -19,10 +19,11 @@ const signUpFormSchema = z
     username: z.string({ message: "请输入用户名" }).max(16, "不超过16个字符").min(4, "不少于4个字符"),
     password: z.string({ message: "请输入密码" }).max(16, "不超过16个字符").min(4, "不少于4个字符"),
     confirmPassword: z.string({ message: "请确认密码" }).max(16, "不超过16个字符").min(4, "不少于4个字符"),
+    name: z.string({ message: "请输入昵称" }).trim().min(1, "请输入昵称"),
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
-      ctx.addIssue({ path: ['confirmPassword'], code: z.ZodIssueCode.custom, message: "密码不一致" })
+      ctx.addIssue({ path: ["confirmPassword"], code: z.ZodIssueCode.custom, message: "密码不一致" })
     }
   })
 
@@ -38,8 +39,8 @@ const SignUp: FC<SignUpProps> = () => {
     },
   })
 
-  const signUp = async (data: z.infer<typeof signUpFormSchema>) => {
-    const { success } = await request.post("/api/account/register", data)
+  const signUp = async ({ username, password, name }: z.infer<typeof signUpFormSchema>) => {
+    const { success } = await request.post("/api/account/register", { username, password, name })
     if (success) {
       toast.success("注册成功")
       router.push("/")
@@ -50,10 +51,7 @@ const SignUp: FC<SignUpProps> = () => {
     <div>
       <div className="w-[480px] p-[12px] shadow mx-auto rounded mt-[200px] border">
         <Form {...signUpForm}>
-          <form
-            onSubmit={signUpForm.handleSubmit(signUp)}
-            className="w-full space-y-6"
-          >
+          <form onSubmit={signUpForm.handleSubmit(signUp)} className="w-full space-y-6">
             <FormField
               control={signUpForm.control}
               name="username"
@@ -90,9 +88,23 @@ const SignUp: FC<SignUpProps> = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={signUpForm.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="昵称" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="flex items-center justify-between">
               <Button type="submit">注册</Button>
-              <Link href="/sign/in" className="text-[12px]">已有账号？去登录</Link>
+              <Link href="/sign/in" className="text-[12px]">
+                已有账号？去登录
+              </Link>
             </div>
           </form>
         </Form>
