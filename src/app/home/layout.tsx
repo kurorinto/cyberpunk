@@ -1,3 +1,4 @@
+"use client"
 import Header from "@/components/Header"
 import { FC, Fragment, PropsWithChildren } from "react"
 

@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 import { FC } from "react"
 
 interface HeaderProps {}
@@ -8,8 +9,8 @@ const Header: FC<HeaderProps> = () => {
     <header className="sticky top-0 h-[64px] flex justify-center shadow backdrop-blur">
       <div className="w-[1400px] px-[24px] flex items-center justify-between">
         <nav className="flex items-center gap-[24px]">
-          <a href="">Home</a>
-          <a href="">Dashboard</a>
+          <Link href="/home">Home</Link>
+          <Link href="/">Dashboard</Link>
         </nav>
         <div className="flex items-center">
           <a href="" className="w-[32px] h-[32px] rounded-full overflow-hidden">
