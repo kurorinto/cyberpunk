@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { User } from "@/app/api/account/login/route"
 
 export type UserState = {
-  userInfo: Partial<Omit<User, 'password'>>
+  userInfo: Partial<Omit<User, 'password'>> & { loggedIn?: boolean }
 }
 
 export type UserActions = {

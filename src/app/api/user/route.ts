@@ -1,4 +1,4 @@
-import { failure, success } from "@/apiHandlers/resultUtils"
+import { success } from "@/apiHandlers/resultUtils"
 import pool from "@/db"
 import { ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET } from "@/request"
 import * as jose from 'jose'
@@ -24,8 +24,14 @@ export const GET = async (request: Request) => {
 
   if (result instanceof Array) {
     const { password, ...userInfo } = result[0] as User
-    return success(userInfo)
+    return success({ ...userInfo, loggedIn: true })
   }
 
-  return failure('获取用户信息失败')
+  return success({
+    id: null,
+    username: null,
+    nick: null,
+    avatar: null,
+    loggedIn: false,
+  })
 }
