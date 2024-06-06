@@ -3,6 +3,14 @@ import pool from "@/db"
 import { ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_KEY, REFRESH_TOKEN_SECRET } from "@/request"
 import * as jose from 'jose'
 
+interface User {
+  id: number
+  username: string
+  password: string
+  nick: string
+  avatar: string
+}
+
 export const POST = async (request: Request) => {
   const body = await request.json()
   const { username, password } = body
@@ -19,10 +27,11 @@ export const POST = async (request: Request) => {
     // todo: 后续再看是否需要清除登录态
     return failure('用户名或密码错误')
   }
+  const { password: _pass, ...userInfo } = result[0] as User
 
   // 账号正确 生成双token
-  const at = await new jose.SignJWT({ username, password }).setExpirationTime('1m').setProtectedHeader({ alg: 'HS256' }).sign(ACCESS_TOKEN_SECRET)
-  const rt = await new jose.SignJWT({ username, password }).setExpirationTime('30d').setProtectedHeader({ alg: 'HS256' }).sign(REFRESH_TOKEN_SECRET)
+  const at = await new jose.SignJWT({ ...userInfo }).setExpirationTime('1m').setProtectedHeader({ alg: 'HS256' }).sign(ACCESS_TOKEN_SECRET)
+  const rt = await new jose.SignJWT({ ...userInfo }).setExpirationTime('30d').setProtectedHeader({ alg: 'HS256' }).sign(REFRESH_TOKEN_SECRET)
 
   return success(null, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=${at};PATH=/`, [REFRESH_TOKEN_KEY]: rt } })
 }

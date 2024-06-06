@@ -11,9 +11,9 @@ export const POST = async (request: Request) => {
     const res = await jose.jwtVerify(rt, REFRESH_TOKEN_SECRET)
     // 校验成功 重新生成双token
     if (typeof res !== 'string') {
-      const { username, password } = res.payload
-      const at = await new jose.SignJWT({ username, password }).setExpirationTime('1m').setProtectedHeader({ alg: 'HS256' }).sign(ACCESS_TOKEN_SECRET)
-      const rt = await new jose.SignJWT({ username, password }).setExpirationTime('30d').setProtectedHeader({ alg: 'HS256' }).sign(REFRESH_TOKEN_SECRET)
+      const { exp, ...userInfo } = res.payload
+      const at = await new jose.SignJWT({ ...userInfo }).setExpirationTime('1m').setProtectedHeader({ alg: 'HS256' }).sign(ACCESS_TOKEN_SECRET)
+      const rt = await new jose.SignJWT({ ...userInfo }).setExpirationTime('30d').setProtectedHeader({ alg: 'HS256' }).sign(REFRESH_TOKEN_SECRET)
 
       return success(null, { headers: { 'set-cookie': `${ACCESS_TOKEN_KEY}=${at};PATH=/`, [REFRESH_TOKEN_KEY]: rt } })
     }
