@@ -3,7 +3,7 @@ import pool from "@/db"
 
 export const POST = async (request: Request) => {
   const body = await request.json()
-  const { username, password, name } = body
+  const { username, password, nick } = body
 
   const [result] = await pool.query(`SELECT * FROM user WHERE username = '${username}'`)
 
@@ -16,7 +16,7 @@ export const POST = async (request: Request) => {
     return failure('账号已存在')
   }
 
-  await pool.execute(`INSERT INTO user (username, password, name) VALUES ('${username}', '${password}', '${name}')`)
+  await pool.execute(`INSERT INTO user (username, password, nick) VALUES ('${username}', '${password}', '${nick}')`)
 
   return success(null)
 }

@@ -19,7 +19,7 @@ const signUpFormSchema = z
     username: z.string({ message: "请输入用户名" }).max(16, "不超过16个字符").min(4, "不少于4个字符"),
     password: z.string({ message: "请输入密码" }).max(16, "不超过16个字符").min(4, "不少于4个字符"),
     confirmPassword: z.string({ message: "请确认密码" }).max(16, "不超过16个字符").min(4, "不少于4个字符"),
-    name: z.string({ message: "请输入昵称" }).trim().min(1, "请输入昵称"),
+    nick: z.string({ message: "请输入昵称" }).trim().min(1, "请输入昵称"),
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
@@ -39,8 +39,8 @@ const SignUp: FC<SignUpProps> = () => {
     },
   })
 
-  const signUp = async ({ username, password, name }: z.infer<typeof signUpFormSchema>) => {
-    const { success } = await request.post("/api/account/register", { username, password, name })
+  const signUp = async ({ username, password, nick }: z.infer<typeof signUpFormSchema>) => {
+    const { success } = await request.post("/api/account/register", { username, password, nick })
     if (success) {
       toast.success("注册成功")
       router.push("/")
@@ -90,7 +90,7 @@ const SignUp: FC<SignUpProps> = () => {
             />
             <FormField
               control={signUpForm.control}
-              name="name"
+              name="nick"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
