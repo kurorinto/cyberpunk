@@ -1,38 +1,27 @@
 import { produce } from 'immer'
-import { createStore } from 'zustand/vanilla'
+import { create } from 'zustand'
+import { User } from "@/app/api/account/login/route"
 
 export type UserState = {
-  userInfo: {
-    name: string;
-    username: string;
-    avatar: string;
-  }
+  userInfo: Partial<Omit<User, 'password'>>
 }
 
 export type UserActions = {
-  setUser: (userInfo: UserState) => void
+  setUser: (userInfo: UserState['userInfo']) => void
 }
 
 export type UserStore = UserState & UserActions
 
 export const defaultInitState: UserState = {
-  userInfo: {
-    name: '',
-    username: '',
-    avatar: '',
-  },
+  userInfo: {},
 }
 
-export const createUserStore = (
-  initState: UserState = defaultInitState,
-) => {
-  return createStore<UserStore>()((set) => ({
-    ...initState,
-    setUser: ({ userInfo }) =>
-      set(
-        produce<UserState>((state) => {
-          state.userInfo = userInfo
-        })
-      ),
-  }))
-}
+export const useStore = create<UserStore>()((set) => ({
+  ...defaultInitState,
+  setUser: (userInfo) =>
+    set(
+      produce<UserState>((state) => {
+        state.userInfo = userInfo
+      })
+    ),
+}))
