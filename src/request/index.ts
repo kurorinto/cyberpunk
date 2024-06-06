@@ -77,7 +77,8 @@ axiosInstance.interceptors.response.use(
           const { success: refreshSuccess } = await request.post('/api/account/refresh', { rt })
           if (refreshSuccess) {
             // 重新请求
-            await axiosInstance(response.config)
+            const res = await axiosInstance(response.config)
+            return res
           }
           break
         case 500:
