@@ -18,7 +18,7 @@ const Header: FC<HeaderProps> = () => {
           <Link href="/">Dashboard</Link>
         </nav>
         {!isEmptyObject(userInfo) && (
-          <a href={userInfo.loggedIn ? "/home" : "/login"} className="flex items-center gap-x-[8px]">
+          <a href={userInfo.loggedIn ? "/home" : "/sign/in"} className="flex items-center gap-x-[8px]">
             <div className="w-[32px] h-[32px] rounded-full overflow-hidden">
               <Image alt="" width={32} height={32} src={userInfo.avatar || DEFAULT_AVATAR} />
             </div>
