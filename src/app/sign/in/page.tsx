@@ -12,6 +12,7 @@ import { FC, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import { useStore } from "@/stores/userStore"
 
 interface SignInProps {}
 
@@ -21,6 +22,8 @@ const signInFormSchema = z.object({
 })
 
 const SignIn: FC<SignInProps> = () => {
+  const setUser = useStore((state) => state.setUser)
+
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
@@ -38,6 +41,12 @@ const SignIn: FC<SignInProps> = () => {
     setLoading(false)
     if (success) {
       toast.success("登录成功")
+      // 刷新用户信息
+      const { success, result } = await request.get("/api/user")
+      if (success && result) {
+        setUser(result)
+      }
+      // 跳转到首页
       router.push("/")
     }
   }

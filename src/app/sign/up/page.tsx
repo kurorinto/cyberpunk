@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import request from "@/request"
+import { useStore } from "@/stores/userStore"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -28,6 +29,7 @@ const signUpFormSchema = z
   })
 
 const SignUp: FC<SignUpProps> = () => {
+  const setUser = useStore((state) => state.setUser)
   const router = useRouter()
 
   const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
@@ -43,6 +45,12 @@ const SignUp: FC<SignUpProps> = () => {
     const { success } = await request.post("/api/account/register", { username, password, nick })
     if (success) {
       toast.success("注册成功")
+      // 刷新用户信息
+      const { success, result } = await request.get("/api/user")
+      if (success && result) {
+        setUser(result)
+      }
+      // 跳转到首页
       router.push("/")
     }
   }
