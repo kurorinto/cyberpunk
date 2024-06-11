@@ -1,4 +1,4 @@
-interface Caret  {
+interface Caret {
   visible: boolean
   x: number
   y: number
@@ -25,6 +25,7 @@ export class CyberEditor {
   public focused = false
   /** 光标 */
   private caret: Caret = { visible: false, x: 12, y: 12, w: 1, h: CyberEditor.LINE_HEIGHT }
+  private blinkTimer: NodeJS.Timeout | undefined
 
   constructor(root: string) {
     this.root = root
@@ -58,6 +59,22 @@ export class CyberEditor {
     }
   }
 
+  /** 光标闪烁 */
+  private blinkCaret() {
+    this.draw()
+    clearTimeout(this.blinkTimer)
+    this.blinkTimer = setTimeout(() => {
+      this.caret.visible = !this.caret.visible
+      this.blinkCaret()
+    }, 500)
+  }
+
+  private clearCaret() {
+    this.caret.visible = false
+    this.draw()
+    clearTimeout(this.blinkTimer)
+  }
+
   // 使用箭头函数，因为 this 会指向 CyberEditor 实例
   private keypressHandler = (e: KeyboardEvent) => {
     if (this.focused) {
@@ -68,10 +85,17 @@ export class CyberEditor {
   // 使用箭头函数，因为 this 会指向 CyberEditor 实例
   private clickHandler = (e: MouseEvent) => {
     this.focused = e.target === this.canvas
-    if (this.ctx) {
-      // 添加光标
+    if (!this.ctx) {
+      throw new Error("Canvas context not found")
+    }
+
+    if (this.focused) {
+      // 显示光标
       this.caret.visible = true
-      this.draw()
+      this.blinkCaret()
+    } else {
+      // 去掉光标
+      this.clearCaret()
     }
   }
 
