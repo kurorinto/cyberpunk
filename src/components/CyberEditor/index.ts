@@ -23,14 +23,37 @@ export class CyberEditor {
   /** 容器选择器 */
   public root: string
 
+  /** 输入法div */
+  private textBox: HTMLDivElement = document.createElement("div")
+
   /** 是否聚焦 */
-  public focused = false
+  public _focused = false
+  /** 是否正在输入法输入 */
+  public isComposing = false
   /** 光标 */
   private caret: Caret = { visible: false, x: 12, y: 12, w: 1, h: CyberEditor.LINE_HEIGHT }
   private blinkTimer: NodeJS.Timeout | undefined
 
   /** 文本内容 */
   private text = ""
+
+  /** 是否聚焦 */
+  set focused(focused: boolean) {
+    this._focused = focused
+    if (this._focused) {
+      // 闪烁光标
+      this.blinkCaret()
+      this.textBox.focus()
+    } else {
+      // 去掉光标
+      this.clearCaret()
+      this.textBox.blur()
+      this.textBox.innerHTML = ""
+    }
+  }
+  get focused() {
+    return this._focused
+  }
 
   constructor(root: string) {
     this.root = root
@@ -48,6 +71,23 @@ export class CyberEditor {
     this.canvas.height = Math.max(height, CyberEditor.MIN_HEIGHT)
     this.canvas.style.boxShadow = "0 0 0 1px #ccc"
     rootDOM.appendChild(this.canvas)
+
+    this.textBox.style.position = "absolute"
+    this.textBox.style.top = "0"
+    this.textBox.style.left = "0"
+    this.textBox.style.pointerEvents = "none"
+    this.textBox.style.opacity = "0"
+    this.textBox.style.userSelect = "none"
+    this.textBox.style.outline = "none"
+    this.textBox.style.zIndex = "-1"
+    this.textBox.style.fontSize = `${CyberEditor.FONT_SIZE}px`
+    this.textBox.style.lineHeight = `${CyberEditor.LINE_HEIGHT}px`
+    this.textBox.contentEditable = "true"
+    this.textBox.onblur = () => {
+      this.textBox.innerHTML = ""
+      this.focused = false
+    }
+    rootDOM.appendChild(this.textBox)
 
     this.bindEvents()
   }
@@ -69,12 +109,15 @@ export class CyberEditor {
   }
 
   /** 光标闪烁 */
-  private blinkCaret() {
+  private blinkCaret(visible?: boolean) {
+    if (visible === undefined) {
+      this.caret.visible = true
+    }
     this.draw()
     clearTimeout(this.blinkTimer)
     this.blinkTimer = setTimeout(() => {
       this.caret.visible = !this.caret.visible
-      this.blinkCaret()
+      this.blinkCaret(this.caret.visible)
     }, 500)
   }
 
@@ -89,13 +132,15 @@ export class CyberEditor {
     if (this.focused) {
       const { key, altKey, metaKey, ctrlKey, shiftKey, code } = e
       if (key.length === 1) {
-        this.insertText(key)
+        if (this.isComposing) {
+        } else {
+          this.insertText(key)
+        }
       }
       switch (key) {
         case 'Backspace':
           this.deleteText()
           break
-
         default:
           break
       }
@@ -106,33 +151,36 @@ export class CyberEditor {
   // 使用箭头函数，因为 this 会指向 CyberEditor 实例
   private clickHandler = (e: MouseEvent) => {
     this.focused = e.target === this.canvas
-    if (!this.ctx) {
-      throw new Error("Canvas context not found")
-    }
+  }
 
-    if (this.focused) {
-      // 显示光标
-      this.caret.visible = true
-      this.blinkCaret()
-    } else {
-      // 去掉光标
-      this.clearCaret()
-    }
+  private compositionstartHandler = (e: CompositionEvent) => {
+    this.isComposing = true
+  }
+
+  private compositionendHandler = (e: CompositionEvent) => {
+    this.insertText(this.textBox.innerHTML)
+    this.textBox.innerHTML = ""
+    this.isComposing = false
   }
 
   private bindEvents() {
     document.addEventListener("click", this.clickHandler)
     document.addEventListener("keydown", this.keydownHandler)
+    document.addEventListener("compositionstart", this.compositionstartHandler)
+    document.addEventListener("compositionend", this.compositionendHandler)
   }
 
   private removeEvents() {
-    document.addEventListener("click", this.clickHandler)
+    document.removeEventListener("click", this.clickHandler)
     document.removeEventListener("keydown", this.keydownHandler)
+    document.removeEventListener("compositionstart", this.compositionstartHandler)
+    document.removeEventListener("compositionend", this.compositionendHandler)
   }
 
   public destroy() {
     this.removeEvents()
     this.canvas.remove()
+    this.textBox.remove()
     this.clearCaret()
   }
 
@@ -143,7 +191,6 @@ export class CyberEditor {
 
     this.text += text
     this.caret.x += text.length * this.ctx.measureText(text).width
-    this.caret.visible = true
     this.blinkCaret()
     this.draw()
   }
@@ -155,7 +202,6 @@ export class CyberEditor {
     const text = this.text.slice(-1)
     this.text = this.text.slice(0, this.text.length - 1)
     this.caret.x -= text.length * this.ctx.measureText(text).width
-    this.caret.visible = true
     this.blinkCaret()
     this.draw()
   }
